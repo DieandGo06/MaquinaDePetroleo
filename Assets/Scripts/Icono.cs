@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Icono : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] Animation good, bad;
+
     void Start()
     {
         

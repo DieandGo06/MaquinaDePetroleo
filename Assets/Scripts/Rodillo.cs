@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Rodillo : MonoBehaviour
 {
+    [SerializeField] int rodilloID;
     public float maxSpeed;
     public float currentSpeed;
     public float maxDeceleration;
@@ -12,6 +13,8 @@ public class Rodillo : MonoBehaviour
 
     bool estaGirando;
     bool estaFrenando;
+    float tiempoToInciarFreno = 2;
+
 
 
     private void Start()
@@ -25,16 +28,20 @@ public class Rodillo : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                IniciarTirada();
-                Tareas.Nueva(3, () => estaFrenando = true);
+                if (GameManager.instance.contadorTiradas == rodilloID)
+                {
+                    IniciarTirada();
+                    GameManager.instance.SumarTirada();
+                    Tareas.Nueva(tiempoToInciarFreno, () => estaFrenando = true);
+                }
             }
         }
-        
+
     }
 
     private void FixedUpdate()
     {
-        if(estaGirando)
+        if (estaGirando)
         {
             Girar();
             if (estaFrenando) Frenar();
@@ -53,10 +60,10 @@ public class Rodillo : MonoBehaviour
 
     void Frenar()
     {
-        currentSpeed -= currentDeceleration* Time.fixedDeltaTime;
+        currentSpeed -= currentDeceleration * Time.fixedDeltaTime;
         currentDeceleration -= Time.fixedDeltaTime;
 
-        if(currentSpeed <= 0)
+        if (currentSpeed <= 0)
         {
             currentSpeed = 0;
             estaGirando = false;
