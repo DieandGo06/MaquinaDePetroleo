@@ -7,52 +7,56 @@ public class Rodillo : MonoBehaviour
     [SerializeField] int rodilloID;
     public float maxSpeed;
     public float currentSpeed;
-    public float maxDeceleration;
-    public float currentDeceleration;
+    public float tiempoToInciarFreno;
+    public float distanciaEntreIconos;
     public List<Rigidbody2D> iconos = new List<Rigidbody2D>();
+    public Rigidbody2D ultimoIcono;
 
-    bool estaGirando;
     bool estaFrenando;
-    float tiempoToInciarFreno = 2;
-
+    public float contadorVueltas;
 
 
     private void Start()
     {
-
+        GameManager.instance.IniciarTirada.AddListener(IniciarTirada);
     }
 
-    private void Update()
+    private void OnDisable()
     {
-        if (!estaGirando)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                if (GameManager.instance.contadorTiradas == rodilloID)
-                {
-                    IniciarTirada();
-                    GameManager.instance.SumarTirada();
-                    Tareas.Nueva(tiempoToInciarFreno, () => estaFrenando = true);
-                }
-            }
-        }
-
+        GameManager.instance.IniciarTirada.RemoveListener(IniciarTirada);
     }
+
+
 
     private void FixedUpdate()
     {
-        if (estaGirando)
+        if (GameManager.instance.contadorTiradas == rodilloID)
         {
-            Girar();
-            if (estaFrenando) Frenar();
+            if (GameManager.instance.estado == GameManager.Estados.standBy)
+            {
+
+            }
+            if (GameManager.instance.estado == GameManager.Estados.tiradaIniciada)
+            {
+                Girar();
+                if (estaFrenando) Frenar();
+            }
+            if (GameManager.instance.estado == GameManager.Estados.iconoSeleccionado)
+            {
+
+            }
+            if (GameManager.instance.estado == GameManager.Estados.consecuencias)
+            {
+
+            }
         }
     }
-
 
     void Girar()
     {
         foreach (Rigidbody2D icono in iconos)
         {
+            //icono.velocity = Vector3.up * currentSpeed;
             float newPosY = icono.transform.position.y + (currentSpeed * Time.fixedDeltaTime);
             icono.MovePosition(new Vector3(icono.transform.position.x, newPosY, icono.transform.position.z));
         }
@@ -60,22 +64,28 @@ public class Rodillo : MonoBehaviour
 
     void Frenar()
     {
-        currentSpeed -= currentDeceleration * Time.fixedDeltaTime;
-        currentDeceleration -= Time.fixedDeltaTime;
+        if (currentSpeed > 5f)
+        {
+            currentSpeed -= (Mathf.Log(currentSpeed) * 5) * Time.fixedDeltaTime;
+        }
+        else
+        {
+            currentSpeed -= (Time.fixedDeltaTime/3) + (currentSpeed/10) * Time.fixedDeltaTime;
+        }
+
+        //currentDeceleration -= (Mathf.Log(currentDeceleration)/2) * Time.fixedDeltaTime;
 
         if (currentSpeed <= 0)
         {
             currentSpeed = 0;
-            estaGirando = false;
             estaFrenando = false;
-            currentDeceleration = maxDeceleration;
+            GameManager.instance.CambiarEstado(GameManager.Estados.iconoSeleccionado);
         }
     }
 
     void IniciarTirada()
     {
-        estaGirando = true;
         currentSpeed = maxSpeed;
-        currentDeceleration = maxDeceleration;
+        Tareas.Nueva(tiempoToInciarFreno, () => estaFrenando = true);
     }
 }
