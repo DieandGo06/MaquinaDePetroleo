@@ -6,6 +6,10 @@ TagManager:
   tags:
   - Iconos
   - Limite
+  - InicioRodillo
+  - ReboteSuperior
+  - ReboteInferior
+  - Detenerse
   layers:
   - Default
   - TransparentFX

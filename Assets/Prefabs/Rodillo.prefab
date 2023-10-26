@@ -50,11 +50,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3b68b620a0c87047a890072a64c5a92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rodilloID: 0
-  maxSpeed: 50.03
+  rodilloID: 1
+  maxSpeed: 50
   currentSpeed: 0
   tiempoToInciarFreno: 1.79
   distanciaEntreIconos: 2
+  contadorVueltas: 0
+  maximoVueltas: 13
+  iconoSeleccionado: {fileID: 0}
+  ultimoIcono: {fileID: 2556560452022090608}
+  triggerReboteSuperior: {fileID: 0}
+  triggerReboteInferior: {fileID: 0}
+  triggerDetenerse: {fileID: 0}
   iconos:
   - {fileID: 4333034345475107373}
   - {fileID: 8659016899097115603}
@@ -62,7 +69,8 @@ MonoBehaviour:
   - {fileID: 611747997502322557}
   - {fileID: 914727185006513054}
   - {fileID: 2556560452022090608}
-  ultimoIcono: {fileID: 2556560452022090608}
+  estaFrenando: 0
+  puedeDetenerse: 0
 --- !u!1001 &1289885870286740230
 PrefabInstance:
   m_ObjectHideFlags: 0

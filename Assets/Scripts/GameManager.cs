@@ -12,9 +12,9 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public int contadorTiradas;
     public AnimationCam camaraScript;
 
-    public UnityEvent IniciarTirada;
-    public UnityEvent PlayZoomOut;
-    public UnityEvent PlayZoomIn;
+    [HideInInspector] public UnityEvent IniciarTirada;
+    [HideInInspector] public UnityEvent PlayZoomOut;
+    [HideInInspector] public UnityEvent PlayZoomIn;
 
 
 
@@ -28,8 +28,10 @@ public class GameManager : MonoBehaviour
     {
         if (estado == Estados.standBy)
         {
+            
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                if (contadorTiradas == 3) contadorTiradas = 0;
                 SumarTirada();
                 IniciarTirada.Invoke();
                 CambiarEstado(Estados.tiradaIniciada);
