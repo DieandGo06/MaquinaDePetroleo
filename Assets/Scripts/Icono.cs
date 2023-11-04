@@ -5,6 +5,7 @@ using UnityEngine;
 public class Icono : MonoBehaviour
 {
     [SerializeField] Animation good, bad;
+    public AnimationClip anicacionBuena, animacionMala;
     public bool cuentaVueltas;
     Rigidbody2D rb;
     Rodillo rodilloPadre;
