@@ -1,12 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Video;
 using UnityEngine;
 
 public class Icono : MonoBehaviour
 {
+    public int iconoID;
     [SerializeField] Animation good, bad;
-    public AnimationClip anicacionBuena, animacionMala;
     public bool cuentaVueltas;
+
+
+    [Header("Animacion/Video")]
+    public VideoClip animacionBuena;
+    public VideoClip animacionMala;
+
+    //Privadas
     Rigidbody2D rb;
     Rodillo rodilloPadre;
 
@@ -61,7 +69,7 @@ public class Icono : MonoBehaviour
                 rodilloPadre.currentSpeed = 0;
             }
         }
-        
+
     }
 }
 

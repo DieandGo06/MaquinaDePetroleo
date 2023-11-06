@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Video;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class Rodillo : MonoBehaviour
@@ -12,6 +14,10 @@ public class Rodillo : MonoBehaviour
     public float distanciaEntreIconos;
     public float contadorVueltas;
     public float maximoVueltas;
+
+    [Header("Sistema de Videos")]
+    public VideoPlayer videoPlayer;
+    public RawImage lienzo;
 
 
     [Header("Sistema de iconos")]
@@ -57,7 +63,9 @@ public class Rodillo : MonoBehaviour
             }
             if (GameManager.instance.estado == GameManager.Estados.iconoSeleccionado)
             {
-
+                GameManager.instance.GuardarID_iconosSeleccionado(iconoSeleccionado.gameObject.GetComponent<Icono>().iconoID);
+                lienzo.gameObject.SetActive(true);
+                videoPlayer.Play();
             }
             if (GameManager.instance.estado == GameManager.Estados.consecuencias)
             {
@@ -77,7 +85,7 @@ public class Rodillo : MonoBehaviour
 
     void Desacelerar()
     {
-        if (currentSpeed > 3f)
+        if (currentSpeed > 2f)
         {
             currentSpeed -= (Mathf.Log(currentSpeed) * 6) * Time.fixedDeltaTime;
         }
@@ -96,19 +104,27 @@ public class Rodillo : MonoBehaviour
             }
             else if (currentSpeed == 0)
             {
-                ReiniciarRodillo();
+                ReiniciarTriggersToStop(); ;
                 GameManager.instance.CambiarEstado(GameManager.Estados.iconoSeleccionado);
             }
         }
     }
 
-    void ReiniciarRodillo()
+    
+
+    void ReiniciarTriggersToStop()
     {
-        estaFrenando = false;
-        puedeDetenerse = false;
         triggerReboteSuperior.SetActive(false);
         triggerReboteInferior.SetActive(false);
         triggerDetenerse.SetActive(false);
+    }
+
+    //Lo ejecuta el GameManager tras las tres tiradas
+    public void ReiniciarRodillo()
+    {
+        estaFrenando = false;
+        puedeDetenerse = false;
+        lienzo.gameObject.SetActive(false);
         iconoSeleccionado = null;
         contadorVueltas = 0;
     }
@@ -123,10 +139,12 @@ public class Rodillo : MonoBehaviour
             if(iconoSeleccionado == null)
             {
                 SeleccionarIconoAleatorio();
+                videoPlayer.clip = iconoSeleccionado.gameObject.GetComponent<Icono>().animacionBuena;
             }
             else
             {
                 TrucarTirada();
+                videoPlayer.clip = iconoSeleccionado.gameObject.GetComponent<Icono>().animacionBuena;
             }
         }
     }
