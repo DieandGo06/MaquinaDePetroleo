@@ -6,38 +6,42 @@ using UnityEngine;
 
 public class Rodillo : MonoBehaviour
 {
-    [Header("Propeidades")]
-    [SerializeField] int rodilloID;
-    public float maxSpeed;
-    public float currentSpeed;
-    public float tiempoToInciarFreno;
+    [Header("Propiedades del Rodillo")]
+    public int rodilloID;
     public float distanciaEntreIconos;
+
+    [Header("Sistema de Giro")]
+    public float currentSpeed;
+    public float maxSpeed;
+    public float timerToDesacelerar;
     public float contadorVueltas;
     public float maximoVueltas;
+    bool estaDesacelerando;
+    bool puedeDetenerse;
 
     [Header("Sistema de Videos")]
     public VideoPlayer videoPlayer;
     public RawImage lienzo;
 
-
-    [Header("Sistema de iconos")]
+    [Header("Sistema de Trucadas de Iconos")]
+    [SerializeField] string nombreIconoSeleccionado;
     public Rigidbody2D iconoSeleccionado;
     public Rigidbody2D ultimoIcono;
-    public GameObject triggerReboteSuperior;
-    public GameObject triggerReboteInferior;
-    public GameObject triggerDetenerse;
-    public List<Rigidbody2D> iconos = new List<Rigidbody2D>();
+    List<Rigidbody2D> iconosRB;
+    List<Icono> iconos;
 
 
-    public bool estaFrenando, puedeDetenerse;
-    float tiempo;
 
+
+    private void Awake()
+    {
+        iconosRB = new List<Rigidbody2D>();
+        iconos = new List<Icono>();
+    }
 
     private void Start()
     {
         GameManager.instance.IniciarTirada.AddListener(IniciarTirada);
-        float aceleration = ((2 * (8 - 0)) / 3 * Mathf.Exp(2)) - ((2 * 3) / 3);
-        Debug.Log(aceleration);
     }
 
     private void OnDisable()
@@ -52,31 +56,31 @@ public class Rodillo : MonoBehaviour
         if (GameManager.instance.contadorTiradas == rodilloID)
         {
             if (GameManager.instance.estado == GameManager.Estados.standBy)
-            {
+            { }
 
-            }
             if (GameManager.instance.estado == GameManager.Estados.tiradaIniciada)
             {
                 Girar();
-                if (estaFrenando && !puedeDetenerse) Desacelerar();
-                if (puedeDetenerse) Frenar();
+                if (estaDesacelerando) Desacelerar();
             }
+
             if (GameManager.instance.estado == GameManager.Estados.iconoSeleccionado)
             {
-                GameManager.instance.GuardarID_iconosSeleccionado(iconoSeleccionado.gameObject.GetComponent<Icono>().iconoID);
                 lienzo.gameObject.SetActive(true);
                 videoPlayer.Play();
             }
-            if (GameManager.instance.estado == GameManager.Estados.consecuencias)
-            {
 
-            }
+            if (GameManager.instance.estado == GameManager.Estados.consecuencias)
+            { }
         }
     }
 
+
+
+
     void Girar()
     {
-        foreach (Rigidbody2D icono in iconos)
+        foreach (Rigidbody2D icono in iconosRB)
         {
             float newPosY = icono.transform.position.y + (currentSpeed * Time.fixedDeltaTime);
             icono.MovePosition(new Vector3(icono.transform.position.x, newPosY, icono.transform.position.z));
@@ -85,44 +89,34 @@ public class Rodillo : MonoBehaviour
 
     void Desacelerar()
     {
-        if (currentSpeed > 2f)
+        //Frena tras superar el timer para desacelerar
+        if (!puedeDetenerse)
         {
-            currentSpeed -= (Mathf.Log(currentSpeed) * 6) * Time.fixedDeltaTime;
+            if (currentSpeed > 3.5f) currentSpeed -= (Mathf.Log(currentSpeed) * 8.5f) * Time.fixedDeltaTime;
+            //Desacelerar cuando aun no ha dado el primer rebote
+            else currentSpeed -= (currentSpeed / 4.5f) * Time.fixedDeltaTime;
         }
-        else currentSpeed -= (currentSpeed /10) * Time.fixedDeltaTime;
-
-    }
-
-    void Frenar()
-    {
-        if (puedeDetenerse)
+        //Frena tras dar el primer rebote para detenerse
+        else
         {
             if (currentSpeed != 0)
             {
-                if (currentSpeed > 0) currentSpeed -= (Time.fixedDeltaTime / 2f);
-                else currentSpeed += (Time.fixedDeltaTime / 2f);
-            }
-            else if (currentSpeed == 0)
-            {
-                ReiniciarTriggersToStop(); ;
-                GameManager.instance.CambiarEstado(GameManager.Estados.iconoSeleccionado);
+                //Desacelerar cuando hace el PRIMER rebote
+                if (currentSpeed > 0) currentSpeed -= (Time.fixedDeltaTime / 5f);
+                //Desacelerar cuando hace el SEGUNDO rebote
+                else currentSpeed += (Time.fixedDeltaTime / 5f);
             }
         }
     }
 
-    
 
-    void ReiniciarTriggersToStop()
-    {
-        triggerReboteSuperior.SetActive(false);
-        triggerReboteInferior.SetActive(false);
-        triggerDetenerse.SetActive(false);
-    }
+
+    
 
     //Lo ejecuta el GameManager tras las tres tiradas
     public void ReiniciarRodillo()
     {
-        estaFrenando = false;
+        estaDesacelerando = false;
         puedeDetenerse = false;
         lienzo.gameObject.SetActive(false);
         iconoSeleccionado = null;
@@ -134,29 +128,51 @@ public class Rodillo : MonoBehaviour
         if (GameManager.instance.contadorTiradas == rodilloID)
         {
             currentSpeed = maxSpeed;
-            Tareas.Nueva(tiempoToInciarFreno, () => estaFrenando = true);
+            Tareas.Nueva(timerToDesacelerar, () => estaDesacelerando = true);
 
-            if(iconoSeleccionado == null)
+            if (iconoSeleccionado == null)
             {
-                SeleccionarIconoAleatorio();
-                videoPlayer.clip = iconoSeleccionado.gameObject.GetComponent<Icono>().animacionBuena;
+                //SeleccionarIconoAleatorio();
+                videoPlayer.clip = iconoSeleccionado.gameObject.GetComponent<Icono>().animacion;
             }
             else
             {
-                TrucarTirada();
-                videoPlayer.clip = iconoSeleccionado.gameObject.GetComponent<Icono>().animacionBuena;
+                videoPlayer.clip = iconoSeleccionado.gameObject.GetComponent<Icono>().animacion;
             }
         }
     }
 
-    void TrucarTirada()
+
+
+    public Rigidbody2D BuscarIconoPorID(int id)
     {
-        //Falta ver con que icono se trucara
+        foreach (Icono icono in iconos)
+        {
+            if (icono.iconoID == id) return icono.GetComponent<Rigidbody2D>();
+        }
+        return null;
+    }
+
+    public void GetIconoComponent(Icono script, Rigidbody2D rigidbody)
+    {
+        iconos.Add(script);
+        iconosRB.Add(rigidbody);
+    }
+
+    public void SetPuedeDetenerse(bool value)
+    {
+        puedeDetenerse = value;
+    }
+
+    public void SetIconoSeleccionado(Rigidbody2D icono)
+    {
+        nombreIconoSeleccionado = icono.name;
+        iconoSeleccionado = icono;
     }
 
     void SeleccionarIconoAleatorio()
     {
-        int randomNum = Random.Range(0, iconos.Count);
-        iconoSeleccionado = iconos[randomNum];
+        int randomNum = Random.Range(0, iconosRB.Count);
+        iconoSeleccionado = iconosRB[randomNum];
     }
 }

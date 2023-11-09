@@ -146,11 +146,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc59a1c34da0a0a4bb96e9932c867d8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cuentaVueltas: 0
-  good: {fileID: 0}
-  bad: {fileID: 0}
+  iconoID: 0
   animacionBuena: {fileID: 0}
-  animacionMala: {fileID: 32900000, guid: 60c33780c44385c4b89c53740ea777e3, type: 3}
+  cuentaVueltas: 0
 --- !u!1 &5787988497030985289
 GameObject:
   m_ObjectHideFlags: 0
@@ -297,11 +295,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc59a1c34da0a0a4bb96e9932c867d8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cuentaVueltas: 0
-  good: {fileID: 0}
-  bad: {fileID: 0}
+  iconoID: 0
   animacionBuena: {fileID: 0}
-  animacionMala: {fileID: 32900000, guid: 60c33780c44385c4b89c53740ea777e3, type: 3}
+  cuentaVueltas: 0
 --- !u!1 &6771227033883262129
 GameObject:
   m_ObjectHideFlags: 0
@@ -448,11 +444,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc59a1c34da0a0a4bb96e9932c867d8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cuentaVueltas: 0
-  good: {fileID: 0}
-  bad: {fileID: 0}
+  iconoID: 0
   animacionBuena: {fileID: 0}
-  animacionMala: {fileID: 32900000, guid: 60c33780c44385c4b89c53740ea777e3, type: 3}
+  cuentaVueltas: 0
 --- !u!1 &8710976724428288542
 GameObject:
   m_ObjectHideFlags: 0
@@ -501,10 +495,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rodilloID: 3
-  maxSpeed: 50
-  currentSpeed: 0
-  tiempoToInciarFreno: 1.79
   distanciaEntreIconos: 2
+  currentSpeed: 0
+  maxSpeed: 50
+  timerToDesacelerar: 0
   contadorVueltas: 0
   maximoVueltas: 13
   videoPlayer: {fileID: 0}
@@ -518,5 +512,5 @@ MonoBehaviour:
   - {fileID: 8285564852973367871}
   - {fileID: 757571940322089033}
   - {fileID: 7192584137685066259}
-  estaFrenando: 0
+  estaDesacelerando: 0
   puedeDetenerse: 0

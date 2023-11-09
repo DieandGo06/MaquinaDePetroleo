@@ -13,8 +13,6 @@ public class AnimationCam : MonoBehaviour
     void Start()
     {
         director = GetComponent<PlayableDirector>();
-        GameManager.instance.camaraScript = this;
-
         GameManager.instance.PlayZoomIn.AddListener(ZoomIn);
         GameManager.instance.PlayZoomOut.AddListener(ZoomOut);
     }

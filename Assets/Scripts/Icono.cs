@@ -6,67 +6,70 @@ using UnityEngine;
 public class Icono : MonoBehaviour
 {
     public int iconoID;
-    [SerializeField] Animation good, bad;
-    public bool cuentaVueltas;
-
-
-    [Header("Animacion/Video")]
-    public VideoClip animacionBuena;
-    public VideoClip animacionMala;
+    public VideoClip animacion;
+    [SerializeField] bool cuentaVueltas;
 
     //Privadas
     Rigidbody2D rb;
-    Rodillo rodilloPadre;
+    Rodillo rodillo;
+
+
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        rodilloPadre = GetComponentInParent<Rodillo>();
+        rodillo = GetComponentInParent<Rodillo>();
+
+        //Pasa el script y el rigidBody al rodillo
+        rodillo.GetIconoComponent(this, rb);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Limite"))
         {
-            transform.position = new Vector3(transform.position.x, rodilloPadre.ultimoIcono.transform.position.y - rodilloPadre.distanciaEntreIconos, transform.position.z);
-            rodilloPadre.ultimoIcono = GetComponent<Rigidbody2D>();
-
-            if (cuentaVueltas) rodilloPadre.contadorVueltas++;
+            transform.position = new Vector3(transform.position.x, rodillo.ultimoIcono.transform.position.y - rodillo.distanciaEntreIconos, transform.position.z);
+            rodillo.ultimoIcono = GetComponent<Rigidbody2D>();
+        }
+        if (collision.CompareTag("InicioRodillo"))
+        {
+            if (cuentaVueltas) rodillo.contadorVueltas++;
         }
 
-        if (rodilloPadre.contadorVueltas >= rodilloPadre.maximoVueltas)
+        if (rodillo.contadorVueltas >= rodillo.maximoVueltas)
         {
-            if (collision.CompareTag("InicioRodillo") && rodilloPadre.iconoSeleccionado == rb)
+            if (collision.CompareTag("InicioRodillo") && rodillo.iconoSeleccionado == rb)
             {
-                rodilloPadre.triggerReboteSuperior.SetActive(true);
-                rodilloPadre.puedeDetenerse = true;
+                RodillosManager.instance.triggerToReboteSuperior.SetActive(true);
+                rodillo.SetPuedeDetenerse(true);
                 Debug.Log("puede frenar");
             }
 
-            if (collision.CompareTag("ReboteSuperior") && rodilloPadre.iconoSeleccionado == rb)
+            if (collision.CompareTag("ReboteSuperior") && rodillo.iconoSeleccionado == rb)
             {
-                rodilloPadre.triggerReboteInferior.SetActive(true);
-                rodilloPadre.currentSpeed = -0.9f;
+                RodillosManager.instance.triggerToReboteInferior.SetActive(true);
+                rodillo.currentSpeed = -0.75f;
                 Debug.Log("rebote superior");
 
             }
 
-            if (collision.CompareTag("ReboteInferior") && rodilloPadre.iconoSeleccionado == rb)
+            if (collision.CompareTag("ReboteInferior") && rodillo.iconoSeleccionado == rb)
             {
-                rodilloPadre.triggerDetenerse.SetActive(true);
-                rodilloPadre.currentSpeed *= -1f;
+                RodillosManager.instance.triggerToDetenerse.SetActive(true);
+                rodillo.currentSpeed *= -0.6f;
                 Debug.Log("rebote inferior");
             }
 
-            if (collision.CompareTag("Detenerse") && rodilloPadre.iconoSeleccionado == rb)
+            if (collision.CompareTag("Detenerse") && rodillo.iconoSeleccionado == rb)
             {
-                rodilloPadre.currentSpeed = 0;
+                if (GameManager.instance.contadorTiradas == rodillo.rodilloID)
+                {
+                    rodillo.currentSpeed = 0;
+                    RodillosManager.instance.ReiniciarSistemaDeFrenado();
+                    GameManager.instance.CambiarEstado(GameManager.Estados.iconoSeleccionado);
+                    Debug.Log("detuvo");
+                }
             }
         }
 
