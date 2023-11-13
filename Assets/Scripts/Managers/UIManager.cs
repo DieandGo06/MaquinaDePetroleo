@@ -105,16 +105,11 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void CambiarConsolaTrasExplosion()
-    {
-        consola.sprite = consolaQuemada;
-    }
-
     void BajarBarraDePetroleo()
     {
         Tareas.NuevaConDuracion(0.8f, 0.2f, 10f, () =>
         {
-            Vector3 newPos = new Vector3(barraDePetroleo.position.x, barraDePetroleo.position.y - (Time.deltaTime/2), barraDePetroleo.position.z);
+            Vector3 newPos = new Vector3(barraDePetroleo.position.x, barraDePetroleo.position.y - (Time.deltaTime / 2), barraDePetroleo.position.z);
             barraDePetroleo.position = newPos;
         }, 84526);
     }
@@ -137,5 +132,13 @@ public class UIManager : MonoBehaviour
             Vector3 newPos = new Vector3(barraDePetroleo.position.x, newPosY, barraDePetroleo.position.z);
             barraDePetroleo.position = newPos;
         }, 269526);
+    }
+
+    public void CambiarConsolaTrasExlosion(float timer)
+    {
+        Tareas.Nueva(timer, () =>
+        {
+            consola.sprite = consolaQuemada;
+        });
     }
 }

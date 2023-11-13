@@ -161,7 +161,7 @@ MonoBehaviour:
   manchas1: {fileID: 614542417}
   manchas2: {fileID: 561514781}
   consola: {fileID: 1016169691}
-  consolaQuemada: {fileID: 21300000, guid: 4edc02f6d2d6d68418180f708f0ff543, type: 3}
+  consolaQuemada: {fileID: 21300000, guid: d44526fc53778de48b7b0ed236609d83, type: 3}
   nombreDeIconos: {fileID: 144808155}
   contadorTotalTiradas: {fileID: 1957526881}
   fondoTexto: {fileID: 1600011756}
@@ -2204,9 +2204,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1000
+  m_SortingOrder: 10000
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.65882355, g: 0.4901961, b: 0.14117648, a: 1}
+  m_Color: {r: 0.10196079, g: 0.09411766, b: 0.09411766, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2272,7 +2272,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 1.72
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2296,7 +2296,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -5}
+  m_LocalPosition: {x: 0, y: -3.03, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3185,9 +3185,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1000
+  m_SortingOrder: 10000
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.65882355, g: 0.4901961, b: 0.14117648, a: 1}
+  m_Color: {r: 0.10196079, g: 0.09411766, b: 0.09411766, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4628,13 +4628,13 @@ MonoBehaviour:
           m_CallState: 2
         - m_Target: {fileID: 33011435}
           m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-          m_MethodName: CambiarConsolaTrasExplosion
-          m_Mode: 1
+          m_MethodName: CambiarConsolaTrasExlosion
+          m_Mode: 4
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
-            m_FloatArgument: 0
+            m_FloatArgument: 5.5
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
@@ -4736,6 +4736,7 @@ MonoBehaviour:
   buenTiro: {fileID: 8300000, guid: 79768efc6db383a47877961c2eb5415a, type: 3}
   malTiro: {fileID: 8300000, guid: d197cf4aec3a55b41aa01405ad8b9aaf, type: 3}
   rebote: {fileID: 8300000, guid: d3ec3b450c69cf943b114fea004034b6, type: 3}
+  alarma: {fileID: 8300000, guid: f8f869bfbb6602947912baf5f927b214, type: 3}
 --- !u!114 &1280169542 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9106914076420614033, guid: 0567076297cb758419b656025551455b, type: 3}

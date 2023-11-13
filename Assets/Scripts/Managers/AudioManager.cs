@@ -23,6 +23,8 @@ public class AudioManager : MonoBehaviour
     public AudioClip buenTiro;
     public AudioClip malTiro;
     public AudioClip rebote;
+    public AudioClip alarma;
+
 
     float volumenAmbiente = 0.6f;
     const string pitchBender_maquina = "MaquinaPitch";
@@ -60,6 +62,10 @@ public class AudioManager : MonoBehaviour
         {
             //RealantizarMaquina();
             maquina.Stop();
+            if (GameManager.instance.contadorRondas == 8 && GameManager.instance.contadorTiradas == 3)
+            {
+                Tareas.NuevaConCooldown(0.8f, 20f, () => PlaySoundEffect(alarma),859426); 
+            }
         }
 
     }
@@ -87,5 +93,10 @@ public class AudioManager : MonoBehaviour
     void PlayAudioRodillo()
     {
         maquina.PlayOneShot(maquinaAudio);
+    }
+
+    public void PlaySoundEffect(AudioClip sound)
+    {
+        efectosGenerales.PlayOneShot(sound);
     }
 }

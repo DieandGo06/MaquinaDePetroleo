@@ -243,15 +243,12 @@ public class GameManager : MonoBehaviour
 
     public void ApagarVideo(float timer)
     {
-        Debug.Log("Tiempo 0");
         Resultados _resultado = resultadoActual; 
         Tareas.Nueva(timer, () =>
         {
             _resultado.playerResultado.clip = UIManager.instance.vacio;
             _resultado.playerResultado.Stop();
             _resultado.playerResultado.Play();
-            Debug.Log("Tiempo Dinamico");
-
         });
 
     }
