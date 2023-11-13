@@ -5,36 +5,60 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
+    public static AudioManager instance;
     [SerializeField] AudioMixer audioMixer;
 
     [Header("AurdioSource")]
-    [SerializeField] AudioSource maquina;
+    public AudioSource ambiente;
+    public AudioSource maquina;
+    public AudioSource efectosMaquina;
+    public AudioSource efectosGenerales;
+    public AudioSource resultadosFinales;
+
+
 
     [Header("Maquina")]
     [SerializeField] AudioMixerGroup maquinaGroup;
     [SerializeField] AudioClip maquinaAudio;
-    [SerializeField] Rodillo rodilloIzq;
-    [SerializeField] Rodillo rodilloCentro;
-    [SerializeField] Rodillo rodilloDer;
+    public AudioClip buenTiro;
+    public AudioClip malTiro;
+    public AudioClip rebote;
 
-
+    float volumenAmbiente = 0.6f;
     const string pitchBender_maquina = "MaquinaPitch";
 
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     void Start()
     {
         GameManager.instance.PreInicioDeTirada.AddListener(PlayAudioRodillo);
-
     }
 
     void Update()
     {
+        if (volumenAmbiente <= 0.25f) volumenAmbiente = 0.25f;
+        else if (volumenAmbiente > 0.6f) volumenAmbiente = 0.6f;
+
+
+        if (GameManager.instance.estado == GameManager.Estados.standBy)
+        {
+            volumenAmbiente += Time.deltaTime/3;
+            ambiente.volume = volumenAmbiente;
+        }
         if (GameManager.instance.estado == GameManager.Estados.tiradaIniciada)
         {
+            volumenAmbiente -= Time.deltaTime/3;
+            ambiente.volume = volumenAmbiente;
+
             RealantizarMaquina();
         }
         if (GameManager.instance.estado == GameManager.Estados.iconoSeleccionado)
         {
+            //RealantizarMaquina();
             maquina.Stop();
         }
 
@@ -45,8 +69,9 @@ public class AudioManager : MonoBehaviour
         //maquina.pitch = speed+0.5f;
         //audioMixer.SetFloat(pitchBender_maquina, 1f / speed+0.5f);
         //Para la entrega
-        maquina.pitch = 0.55f;
-        audioMixer.SetFloat(pitchBender_maquina, 1f / 0.55f);
+        maquina.pitch = 0.60f;
+        efectosMaquina.pitch = 0.60f;
+        audioMixer.SetFloat(pitchBender_maquina, 1f / 0.60f);
     }
 
     public float Remap(float value, float maximoOriginal, float maximoFinal, float minimoOriginal, float minimoFinal)

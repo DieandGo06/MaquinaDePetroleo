@@ -43,22 +43,23 @@ public class Icono : MonoBehaviour
             {
                 RodillosManager.instance.triggerToReboteSuperior.SetActive(true);
                 rodillo.SetPuedeDetenerse(true);
-                Debug.Log("puede frenar");
             }
 
             if (collision.CompareTag("ReboteSuperior") && rodillo.iconoSeleccionado == rb)
             {
+                AudioManager.instance.efectosMaquina.PlayOneShot(AudioManager.instance.rebote);
                 RodillosManager.instance.triggerToReboteInferior.SetActive(true);
                 rodillo.currentSpeed = -0.75f;
-                Debug.Log("rebote superior");
+                //AudioManager.instance.maquina.Stop();
 
+                if (!rodillo.esMaloElIcono) Tareas.Nueva(0.35f, () => AudioManager.instance.efectosGenerales.PlayOneShot(AudioManager.instance.buenTiro));
             }
 
             if (collision.CompareTag("ReboteInferior") && rodillo.iconoSeleccionado == rb)
             {
+                AudioManager.instance.efectosMaquina.PlayOneShot(AudioManager.instance.rebote);
                 RodillosManager.instance.triggerToDetenerse.SetActive(true);
                 rodillo.currentSpeed *= -0.6f;
-                Debug.Log("rebote inferior");
             }
 
             if (collision.CompareTag("Detenerse") && rodillo.iconoSeleccionado == rb)
@@ -68,7 +69,18 @@ public class Icono : MonoBehaviour
                     rodillo.currentSpeed = 0;
                     RodillosManager.instance.ReiniciarSistemaDeFrenado();
                     GameManager.instance.CambiarEstado(GameManager.Estados.iconoSeleccionado);
-                    Debug.Log("detuvo");
+
+                    
+                    if (!rodillo.esMaloElIcono)
+                    {
+                        //AudioManager.instance.efectosGenerales.PlayOneShot(AudioManager.instance.buenTiro);
+                        //Tareas.Nueva(0, () => AudioManager.instance.efectosMaquina.PlayOneShot(AudioManager.instance.rebote));
+                        //Tareas.Nueva(0.15f, () => AudioManager.instance.efectosMaquina.PlayOneShot(AudioManager.instance.rebote));
+                        //Tareas.Nueva(0.30f, () => AudioManager.instance.efectosMaquina.PlayOneShot(AudioManager.instance.rebote));
+
+                    }
+                    else AudioManager.instance.efectosGenerales.PlayOneShot(AudioManager.instance.malTiro);
+
                 }
             }
         }

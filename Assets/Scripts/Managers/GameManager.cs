@@ -9,12 +9,15 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [Serializable]
-    private class Resultados
+    public class Resultados
     {
         public string nombre;
-        public VideoClip animacion;
         public Vector3 combinacion;
-        public bool[] esMalo = new bool[3];
+        public VideoClip animacion;
+        public RawImage lienzoResultado;
+        public VideoPlayer playerResultado;
+        public AudioClip sonido;
+        public bool[] esMaloElIcono = new bool[3];
         public UnityEvent eventoAdicional;
     }
 
@@ -26,13 +29,14 @@ public class GameManager : MonoBehaviour
     [Header("Contadores Generales")]
     public int contadorRondas;
     public int contadorTiradas;
+    public int totalTiradas;
 
     [Header("Control del Loop General")]
     public Estados estado;
-    public Vector3 combinacionActual;
+    public Resultados resultadoActual;
     [SerializeField] Resultados[] resultados;
     bool ultimaTiradaDeRonda;
-    
+
 
 
     [Space(10)]
@@ -71,13 +75,13 @@ public class GameManager : MonoBehaviour
     {
         if (estado == Estados.standBy)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
             {
                 //Leve retraso visual para que entre antes el sonido
                 SumarTirada();
                 PreInicioDeTirada.Invoke();
                 CambiarEstado(Estados.tiradaIniciada);
-                Tareas.Nueva(0.2f, () => IniciarTirada.Invoke());
+                Tareas.Nueva(0.15f, () => IniciarTirada.Invoke());
                 if (contadorTiradas == 3) ultimaTiradaDeRonda = true;
             }
         }
@@ -93,12 +97,26 @@ public class GameManager : MonoBehaviour
         {
             if (!ejecutarUnaVez)
             {
+                if (ultimaTiradaDeRonda)
+                {
+                    Tareas.Nueva(4, () =>
+                    {
+                        ejecutarUnaVez = false;
+                        CambiarEstado(Estados.consecuencias);
+                        PlayZoomOut.Invoke();
+                        //SeleccionarFondo();
+                    });
+                    ejecutarUnaVez = true;
+                    return;
+                }
+
+                //Si no es la tercera tirada de una ronda...
                 Tareas.Nueva(2, () =>
                 {
                     ejecutarUnaVez = false;
                     CambiarEstado(Estados.consecuencias);
                     PlayZoomOut.Invoke();
-                    SeleccionarFondo();
+                    //SeleccionarFondo();
                 });
                 ejecutarUnaVez = true;
             }
@@ -115,15 +133,17 @@ public class GameManager : MonoBehaviour
                     Tareas.Nueva(2, () =>
                     {
                         PlayConsecuencia();
+                        resultadoActual.eventoAdicional.Invoke();
                     });
 
                     Tareas.Nueva(6, () =>
                     {
                         PlayZoomIn.Invoke();
-                        ReiniciarRonda();
-                        NuevaRonda();
-                        Tareas.Nueva(1, () =>
+                        Tareas.Nueva(1.3f, () =>
                         {
+                            if (contadorRondas == 8) contadorRondas = 0;
+                            ReiniciarRonda();
+                            NuevaRonda();
                             CambiarEstado(Estados.standBy);
                             ejecutarUnaVez = false;
                         });
@@ -133,7 +153,7 @@ public class GameManager : MonoBehaviour
                 }
 
                 //Si no es la tercera tirada de una ronda...
-                Tareas.Nueva(3, () =>
+                Tareas.Nueva(4, () =>
                 {
                     PlayZoomIn.Invoke();
                     Tareas.Nueva(1, () =>
@@ -155,8 +175,7 @@ public class GameManager : MonoBehaviour
         //Reinicio
         contadorTiradas = 0;
         ultimaTiradaDeRonda = false;
-        lienzoFinal.gameObject.SetActive(false);
-        UIManager.instance.fondo.sprite = UIManager.instance.fondoBueno;
+        //lienzoFinal.gameObject.SetActive(false);
         foreach (Rodillo rodillo in RodillosManager.instance.rodillos) rodillo.ReiniciarRodillo();
     }
 
@@ -170,6 +189,8 @@ public class GameManager : MonoBehaviour
     public void SumarTirada()
     {
         contadorTiradas++;
+        totalTiradas++;
+        UIManager.instance.contadorTotalTiradas.text = totalTiradas.ToString("00");
     }
 
     public void CambiarEstado(Estados estado_)
@@ -181,50 +202,57 @@ public class GameManager : MonoBehaviour
 
     void TrucarTiradas()
     {
-        combinacionActual = resultados[contadorRondas].combinacion;
-        RodillosManager.instance.rodillos[0].SetIconoSeleccionado(RodillosManager.instance.rodillos[0].BuscarIconoPorID((int)combinacionActual.x));
-        RodillosManager.instance.rodillos[1].SetIconoSeleccionado(RodillosManager.instance.rodillos[1].BuscarIconoPorID((int)combinacionActual.y));
-        RodillosManager.instance.rodillos[2].SetIconoSeleccionado(RodillosManager.instance.rodillos[2].BuscarIconoPorID((int)combinacionActual.z));
+        resultadoActual = resultados[contadorRondas];
+        RodillosManager.instance.rodillos[0].SetIconoSeleccionado(RodillosManager.instance.rodillos[0].BuscarIconoPorID((int)resultadoActual.combinacion.x));
+        RodillosManager.instance.rodillos[1].SetIconoSeleccionado(RodillosManager.instance.rodillos[1].BuscarIconoPorID((int)resultadoActual.combinacion.y));
+        RodillosManager.instance.rodillos[2].SetIconoSeleccionado(RodillosManager.instance.rodillos[2].BuscarIconoPorID((int)resultadoActual.combinacion.z));
+
+        //Indica a cada rodillo si el icono trucado que tienen es bueno o malo en la combinacion
+        for (int i = 0; i < resultados[contadorRondas].esMaloElIcono.Length; i++)
+        {
+            RodillosManager.instance.rodillos[i].esMaloElIcono = resultados[contadorRondas].esMaloElIcono[i];
+        }
     }
+
 
     void PlayConsecuencia()
     {
-        UIManager.instance.videoFinal.clip = resultados[contadorRondas].animacion;
-        UIManager.instance.lienzoVideoFinal.gameObject.SetActive(true);
-        UIManager.instance.videoFinal.Play();
+        resultadoActual.lienzoResultado.gameObject.SetActive(true);
+        resultadoActual.playerResultado.clip = resultadoActual.animacion;
+        resultadoActual.playerResultado.Play();
+        AudioManager.instance.resultadosFinales.PlayOneShot(resultadoActual.sonido);
     }
 
-
-    void SeleccionarFondo()
+    public string GetNombreResultadoFinal()
     {
-        if (contadorTiradas == 1)
-        {
-            UIManager.instance.fondo.sprite = UIManager.instance.fondoBueno;
-        }
-        if (contadorTiradas == 2)
-        {
-            //Primer error
-            if (combinacionActual.x == 1 && combinacionActual.y == 2)
-            {
-                UIManager.instance.fondo.sprite = UIManager.instance.fondoIntermdio;
-            }
-            if (combinacionActual.x == 3 && combinacionActual.y == 1)
-            {
-                UIManager.instance.fondo.sprite = UIManager.instance.fondoIntermdio;
-            }
-        }
-        if (contadorTiradas == 3)
-        {
-            //Segundo Error
-            if (combinacionActual.x == 1 && combinacionActual.y == 2 && combinacionActual.z == 2)
-            {
-                UIManager.instance.fondo.sprite = UIManager.instance.fondoMalo;
-            }
-            if (combinacionActual.x == 3 && combinacionActual.y == 1 && combinacionActual.z == 2)
-            {
-                UIManager.instance.fondo.sprite = UIManager.instance.fondoMalo;
-            }
-        }
+        return resultados[contadorRondas].nombre;
     }
 
+    public bool EsMaloElResultadoFinal()
+    {
+        foreach (bool esMaloElIcono in resultadoActual.esMaloElIcono)
+        {
+            if (esMaloElIcono) return true;
+        }
+        //for (int i = 0; i < resultados[contadorRondas].esMaloElIcono.Length; i++)
+        //{
+        //    if (resultados[contadorRondas].esMaloElIcono[i]) return true;
+        //}
+        return false;
+    }
+
+    public void ApagarVideo(float timer)
+    {
+        Debug.Log("Tiempo 0");
+        Resultados _resultado = resultadoActual; 
+        Tareas.Nueva(timer, () =>
+        {
+            _resultado.playerResultado.clip = UIManager.instance.vacio;
+            _resultado.playerResultado.Stop();
+            _resultado.playerResultado.Play();
+            Debug.Log("Tiempo Dinamico");
+
+        });
+
+    }
 }

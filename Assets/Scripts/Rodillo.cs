@@ -26,9 +26,16 @@ public class Rodillo : MonoBehaviour
     [Header("Sistema de Trucadas de Iconos")]
     [SerializeField] string nombreIconoSeleccionado;
     public Rigidbody2D iconoSeleccionado;
+    public bool esMaloElIcono;
+
+    [Header("Sistema de Iconos")]
+    public SpriteRenderer fondoDeRodillo;
     public Rigidbody2D ultimoIcono;
+
+    //Privadas
     List<Rigidbody2D> iconosRB;
     List<Icono> iconos;
+    bool ejecutarUnaVez;
 
 
 
@@ -56,7 +63,9 @@ public class Rodillo : MonoBehaviour
         if (GameManager.instance.contadorTiradas == rodilloID)
         {
             if (GameManager.instance.estado == GameManager.Estados.standBy)
-            { }
+            {
+                fondoDeRodillo.color = Color.white;
+            }
 
             if (GameManager.instance.estado == GameManager.Estados.tiradaIniciada)
             {
@@ -66,12 +75,19 @@ public class Rodillo : MonoBehaviour
 
             if (GameManager.instance.estado == GameManager.Estados.iconoSeleccionado)
             {
-                lienzo.gameObject.SetActive(true);
-                videoPlayer.Play();
+                if (!ejecutarUnaVez)
+                {
+                    UIManager.instance.nombreDeIconos.text = nombreIconoSeleccionado;
+                    lienzo.gameObject.SetActive(true);
+                    videoPlayer.Play();
+                    CambiarColorDeFondo();
+                    ejecutarUnaVez = true;
+                }
             }
 
             if (GameManager.instance.estado == GameManager.Estados.consecuencias)
-            { }
+            { 
+            }
         }
     }
 
@@ -110,17 +126,17 @@ public class Rodillo : MonoBehaviour
     }
 
 
-
-    
-
     //Lo ejecuta el GameManager tras las tres tiradas
     public void ReiniciarRodillo()
     {
+        ejecutarUnaVez = false;
         estaDesacelerando = false;
         puedeDetenerse = false;
         lienzo.gameObject.SetActive(false);
         iconoSeleccionado = null;
         contadorVueltas = 0;
+        fondoDeRodillo.color = Color.white;
+
     }
 
     void IniciarTirada()
@@ -143,7 +159,6 @@ public class Rodillo : MonoBehaviour
     }
 
 
-
     public Rigidbody2D BuscarIconoPorID(int id)
     {
         foreach (Icono icono in iconos)
@@ -153,22 +168,35 @@ public class Rodillo : MonoBehaviour
         return null;
     }
 
+    void CambiarColorDeFondo()
+    {
+        Color nuevoColor;
+        if (esMaloElIcono) nuevoColor = UIManager.instance.colorMalIcono;
+        else nuevoColor = UIManager.instance.colorBuenIcono;
+        fondoDeRodillo.color = nuevoColor;
+        Debug.Log("Cambio");
+    }
+
+
     public void GetIconoComponent(Icono script, Rigidbody2D rigidbody)
     {
         iconos.Add(script);
         iconosRB.Add(rigidbody);
     }
 
+
     public void SetPuedeDetenerse(bool value)
     {
         puedeDetenerse = value;
     }
+
 
     public void SetIconoSeleccionado(Rigidbody2D icono)
     {
         nombreIconoSeleccionado = icono.name;
         iconoSeleccionado = icono;
     }
+
 
     void SeleccionarIconoAleatorio()
     {
